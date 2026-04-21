@@ -54,7 +54,12 @@ pipeline {
             steps {
                 bat '''
                 docker rm -f %CONTAINER_NAME% || exit 0
-                docker run -d -p 8081:8081 --name %CONTAINER_NAME% %IMAGE_NAME%
+
+                docker run -d -p 8081:8081 ^
+                -e SPRING_DATASOURCE_URL=jdbc:postgresql://host.docker.internal:5432/SpringBoot_DB ^
+                -e SPRING_DATASOURCE_USERNAME=postgres ^
+                -e SPRING_DATASOURCE_PASSWORD=TIGER ^
+                --name %CONTAINER_NAME% %IMAGE_NAME%
                 '''
             }
         }
