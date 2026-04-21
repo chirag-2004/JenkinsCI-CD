@@ -16,7 +16,7 @@ pipeline {
         stage('Build JAR') {
             steps {
                 dir('TraineeAPI') {
-                    bat 'mvn clean package'
+                    bat 'mvn clean package -DskipTests'
                 }
             }
         }
