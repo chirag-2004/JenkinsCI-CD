@@ -7,8 +7,7 @@ pipeline {
     }
 
     environment {
-        IMAGE_NAME = "traineeapi"
-        DOCKERHUB_USER = "chirag1804"
+        IMAGE_NAME = "chirag1804/traineeapi"
         CONTAINER_NAME = "traineeapi-container"
     }
 
@@ -17,7 +16,7 @@ pipeline {
         stage('Build JAR') {
             steps {
                 dir('TraineeAPI') {
-                    bat 'mvn clean package'
+                    bat 'mvn clean package -DskipTests'
                 }
             }
         }
@@ -25,7 +24,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 dir('TraineeAPI') {
-                    bat 'docker build -t traineeapi .'
+                    bat 'docker build -t %IMAGE_NAME% .'
                 }
             }
         }
@@ -45,23 +44,17 @@ pipeline {
             }
         }
 
-        stage('Tag Image') {
+        stage('Push Image') {
             steps {
-                bat 'docker tag traineeapi %DOCKERHUB_USER%/traineeapi:latest'
-            }
-        }
-
-        stage('Push to DockerHub') {
-            steps {
-                bat 'docker push %DOCKERHUB_USER%/traineeapi:latest'
+                bat 'docker push %IMAGE_NAME%'
             }
         }
 
         stage('Run Container') {
             steps {
                 bat '''
-                docker rm -f traineeapi-container || exit 0
-                docker run -d -p 8081:8080 --name traineeapi-container traineeapi
+                docker rm -f %CONTAINER_NAME% || exit 0
+                docker run -d -p 8081:8081 --name %CONTAINER_NAME% %IMAGE_NAME%
                 '''
             }
         }
